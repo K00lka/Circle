@@ -1,84 +1,35 @@
-window:
-  title: "Text editor program"
-  size:
-    width: 500
-    height: 500
-  position:
-    x: "center"
-    y: "center"
-  geometry: "500x500+{x}+{y}"
-  components:
-    text_area:
-      type: "Text"
-      font:
-        name: "Arial"
-        size: 25
-      scrollbar:
-        position: "right"
-        fill: "Y"
-    frame:
-      buttons:
-        - name: "color"
-          action: "change_color"
-        - name: "font_box"
-          action: "change_font"
-          options:
-            font_families: "font.families()"
-        - name: "size_box"
-          action: "change_font"
-          range: [1, 100]
-    menu_bar:
-      - name: "File"
-        options:
-          - label: "New"
-            command: "new_file"
-          - label: "Open"
-            command: "open_file"
-          - label: "Save"
-            command: "save_file"
-          - label: "Exit"
-            command: "quit"
-      - name: "Edit"
-        options:
-          - label: "Cut"
-            command: "cut"
-          - label: "Copy"
-            command: "copy"
-          - label: "Paste"
-            command: "paste"
-      - name: "Help"
-        options:
-          - label: "About"
-            command: "about"
+name: Notes App Tests
 
-functions:
-  change_color:
-    description: "Changes the text color"
-    action: "colorchooser.askcolor()"
-  change_font:
-    description: "Changes the font style and size"
-    action: "text_area.config(font=(font_name.get(), size_box.get()))"
-  new_file:
-    description: "Creates a new file"
-    action: "text_area.delete(1.0, END)"
-  open_file:
-    description: "Opens an existing file"
-    action: "file dialog and file reading"
-  save_file:
-    description: "Saves the current file"
-    action: "file dialog and file writing"
-  cut:
-    description: "Cuts selected text"
-    action: "text_area.event_generate('<<Cut>>')"
-  copy:
-    description: "Copies selected text"
-    action: "text_area.event_generate('<<Copy>>')"
-  paste:
-    description: "Pastes copied text"
-    action: "text_area.event_generate('<<Paste>>')"
-  about:
-    description: "Displays information about the program"
-    action: "showinfo()"
-  quit:
-    description: "Exits the program"
-    action: "window.destroy()"
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.8'  # or any other Python version you prefer
+
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install --upgrade pip
+        pip install -r requirements.txt  # If you have a requirements file for dependencies
+
+    - name: Run tests
+      run: |
+        source venv/bin/activate
+        python -m unittest discover -s tests -p "*.py"  # Assuming your tests are in a 'tests' folder
+
